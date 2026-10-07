@@ -1,1 +1,1 @@
-# electrical-engineering-studying-assistant
+# Electrical Engineering Studying Assistant
