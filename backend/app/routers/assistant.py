@@ -21,7 +21,7 @@ def get_assistant_service() -> AssistantService:
     return AssistantService(GroqEngine(api_key=GROQ_API_KEY, model='openai/gpt-oss-120b', system_prompt='Keep your response relatively concise. No lines, no styles of text.'))
 
 @router.get('/models')
-async def get_models() -> list[dict]:
+def get_models() -> list[dict]:
     response = requests.get(url, headers=headers)
     
     print(type(response))
@@ -29,7 +29,7 @@ async def get_models() -> list[dict]:
     return response.json().get('data')
 
 @router.post('/prompt')
-async def generate(
+def generate(
         prompt: PromptRequest, 
         model: str,
         service: AssistantService = Depends(get_assistant_service)
