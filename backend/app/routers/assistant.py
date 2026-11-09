@@ -1,7 +1,11 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 import requests
 
-from core.config import GROQ_API_KEY
+from core.config import settings
+from database.db import get_session
 from engines.groq import GroqEngine
 from schemas.assistant import PromptRequest, PromptResponse
 from services.assistant import AssistantService
@@ -13,12 +17,16 @@ router = APIRouter(
 
 url = 'https://api.groq.com/openai/v1/models'
 headers = {
-    'Authorization': f'Bearer {GROQ_API_KEY}',
+    'Authorization': f'Bearer {settings.groq_api_key}',
     'Content-Type': 'application/json'
 }
 
-def get_assistant_service() -> AssistantService:
-    return AssistantService(GroqEngine(api_key=GROQ_API_KEY, model='openai/gpt-oss-120b', system_prompt='Keep your response relatively concise. No lines, no styles of text.'))
+
+def get_assistant_service(session: Annotated[Session, Depends(get_session)]) -> AssistantService:
+    engine = GroqEngine(api_key=settings.groq_api_key, model='openai/gpt-oss-120b', system_prompt='Keep your response relatively concise. No styles of text.') 
+
+    return AssistantService(engine=engine, session=session)
+
 
 @router.get('/models')
 def get_models() -> list[dict]:
@@ -28,11 +36,11 @@ def get_models() -> list[dict]:
 
     return response.json().get('data')
 
-@router.post('/prompt')
+
+@router.post('/generate')
 def generate(
         prompt: PromptRequest, 
-        model: str,
-        service: AssistantService = Depends(get_assistant_service)
+        service: Annotated[AssistantService, Depends(get_assistant_service)]
 ) -> PromptResponse:
     content = service.generate(prompt.content)
     return PromptResponse(content=content)

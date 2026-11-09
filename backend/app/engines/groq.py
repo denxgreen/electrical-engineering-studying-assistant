@@ -4,17 +4,16 @@ from engines.base import BaseEngine
 
 class GroqEngine(BaseEngine):
     '''
+    AI Engine using the Groq API
+
     Parameters
     ----------
     api_key : str
     model: str
     system_prompt: str
     '''
-
-    def __init__(self, api_key: str, model: str, system_prompt: str):
-        self.api_key = api_key
-        self.model = model
-        self.system_prompt = system_prompt
+    def __init__(self, api_key: str, model: str, system_prompt: str = ''):
+        super().__init__(api_key, model, system_prompt)
         self.client = Groq(api_key=self.api_key)
 
     def generate(self, prompt: str) -> str:

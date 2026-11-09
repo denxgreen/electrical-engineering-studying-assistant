@@ -1,9 +1,14 @@
+from sqlalchemy.orm import Session
+
 from engines.base import BaseEngine
 
 
 class AssistantService:
-    def __init__(self, engine: BaseEngine):
+    def __init__(self, engine: BaseEngine, session: Session):
         self.engine = engine
+        self._session = session
 
     def generate(self, prompt: str) -> str:
-        return self.engine.generate(prompt)
+        content = self.engine.generate(prompt)
+
+        return content

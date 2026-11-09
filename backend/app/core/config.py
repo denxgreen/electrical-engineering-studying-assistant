@@ -1,9 +1,27 @@
-import os
+from pathlib import Path
 
-from dotenv import load_dotenv
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
+ROOT_DIR = Path(__file__).parent.parent.parent.parent
 
-UVICORN_HOST = os.getenv('UVICORN_HOST')
-UVICORN_PORT = os.getenv('UVICORN_PORT')
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=ROOT_DIR / '.env',
+        env_file_encoding='utf-8',
+    )
+
+    uvicorn_host: str
+    uvicorn_port: int = 8000 
+
+    groq_api_key: str 
+
+    database_url: str
+
+    secret_key: SecretStr
+    algorithm: str = 'HS256'
+    access_token_expire_minutes: int = 30
+    
+
+settings = Settings()
