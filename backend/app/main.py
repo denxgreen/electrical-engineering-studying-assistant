@@ -1,23 +1,27 @@
-import os
-
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request, Form 
+from fastapi import FastAPI 
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from core.config import settings
-from utils.db import create_tables
-import routers
+from db.session import create_tables
+from features.assistant.router import router as assistant_router
+from features.auth.router import router as auth_router
+from features.conversations.router import router as conversations_router
+from features.students.router import router as students_router
+from features.teachers.router import router as teachers_router
+from features.users.router import router as users_router
+import db.registry
 
 create_tables()
 
 app = FastAPI()
-app.include_router(routers.assistant.router)
-app.include_router(routers.auth.router)
-app.include_router(routers.students.router)
-app.include_router(routers.teachers.router)
-app.include_router(routers.users.router)
-#app.include_router(conversation.router)
+
+app.include_router(assistant_router)
+app.include_router(auth_router)
+app.include_router(conversations_router)
+app.include_router(students_router)
+app.include_router(teachers_router)
+app.include_router(users_router)
 
 origins = [
     'http://localhost:3000'
